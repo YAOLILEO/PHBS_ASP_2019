@@ -37,22 +37,13 @@ class BsmModel:
         return bsm_price(strike, spot, self.vol, texp, intr=self.intr, divr=self.divr, cp_sign=cp_sign)
     
     def delta(self, strike, spot, texp, cp_sign=1):
-        ''' 
-        <-- PUT your implementation here
-        '''
-        return 0
+        return np.exp(-self.divr*texp)*ss.norm.cdf(cp_sign*d1)
 
     def vega(self, strike, spot, vol, texp, cp_sign=1):
-        ''' 
-        <-- PUT your implementation here
-        '''
-        return 0
+        return np.exp(-self.divr*texp)*spot*ss.norm.cdf(cp_sign*d1)*np.sqrt(texp)
 
     def gamma(self, strike, spot, vol, texp, cp_sign=1):
-        ''' 
-        <-- PUT your implementation here
-        '''
-        return 0
+        return np.exp(self.divr*texp)*ss.norm.cdf(cp_sign*d1)*1/(spot*self.vol*np.sqrt(T))
 
     def impvol(self, price, strike, spot, texp, cp_sign=1):
         iv_func = lambda _vol: \
