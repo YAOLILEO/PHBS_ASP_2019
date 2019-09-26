@@ -28,26 +28,21 @@ def basket_price_mc_cv(
         strike, spot, vol, weights, texp, cor_m,
         intr, divr, cp_sign, True, n_samples)
     
-    ''' 
-    compute price2: mc price based on normal model
-    make sure you use the same seed
+   
+    # compute price2: mc price based on normal model
 
     # Restore the state in order to generate the same state
     np.random.set_state(rand_st)  
     price2 = basket_price_mc(
         strike, spot, spot*vol, weights, texp, cor_m,
         intr, divr, cp_sign, False, n_samples)
-    '''
-    price2 = 0
 
-    ''' 
-    compute price3: analytic price based on normal model
-    make sure you use the same seed
+ 
+    # compute price3: analytic price based on normal model
     
     price3 = basket_price_norm_analytic(
         strike, spot, vol, weights, texp, cor_m, intr, divr, cp_sign)
-    '''
-    price3 = 0
+   
     
     # return two prices: without and with CV
     return [price1, price1 - (price2 - price3)] 
@@ -70,13 +65,13 @@ def basket_price_mc(
     znorm_m = np.random.normal(size=(n_assets, n_samples))
     
     if( bsm ) :
-        '''
-        PUT the simulation of the geometric brownian motion below
-        '''
-        pass
+
+            prices = forward[:, None] * np.exp(-1/2 * texp * vol[:, None]**2 + np.sqrt(texp) * chol_m @ znorm_m)
+   
+            pass
     else:
         # bsm = False: normal model
-        prices = forward[:,None] + np.sqrt(texp) * chol_m @ znorm_m
+        prices = forward[:, None] + np.sqrt(texp) * chol_m @ znorm_m
     
     price_weighted = weights @ prices
     
@@ -84,10 +79,7 @@ def basket_price_mc(
     return disc_fac * price
 
 
-def basket_price_norm_analytic(
-    strike, spot, vol, weights, 
-    texp, cor_m, intr=0.0, divr=0.0, cp_sign=1
-):
+def basket_price_norm_analytic(strike, spot, vol, weights, texp, cor_m, intr=0.0, divr=0.0, cp_sign=1):
     
     '''
     The analytic (exact) option price under the normal model
@@ -100,8 +92,16 @@ def basket_price_norm_analytic(
     
     PUT YOUR CODE BELOW
     '''
+    div_fac = np.exp(-texp*divr)
+    disc_fac = np.exp(-texp*intr)
+    forward = spot / disc_fac * div_fac
     
-    return 0.0
+    forward_w = weights @ forward
+    
+    cov_m = vol * cor_m * vol[:, None]
+    vol_N = np.sqrt(weights.T @ cov_m @ weights)
+    
+    return  normal_formula(strike, forward_w, vol_N, texp, intr=0.0, divr=0.0, cp_sign=1)
 
 def spread_price_kirk(strike, spot, vol, texp, corr, intr=0, divr=0, cp_sign=1):
     div_fac = np.exp(-texp*divr)
