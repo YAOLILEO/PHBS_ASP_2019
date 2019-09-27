@@ -35,25 +35,19 @@ class NormalModel:
         return normal_formula(strike, spot, self.vol, texp, intr=self.intr, divr=self.divr, cp_sign=cp_sign)
     
     def delta(self, strike, spot, vol, texp, intr=0.0, divr=0.0, cp_sign=1):
-        ''' 
-        <-- PUT your implementation here
-        '''
-        return 0
+      
+        return ss.norm.cdf(d)
 
     def vega(self, strike, spot, vol, texp, intr=0.0, divr=0.0, cp_sign=1):
-        ''' 
-        <-- PUT your implementation here
-        '''
-        return 0
+  
+        return np.sqrt(texp)*ss.norm.pdf(d)
 
     def gamma(self, strike, spot, vol, texp, intr=0.0, divr=0.0, cp_sign=1):
-        ''' 
-        <-- PUT your implementation here
-        '''
-        return 0
+ 
+        return ss.norm.pdf(d)/self.vol*np.sqrt(texp)
 
     def impvol(self, price, strike, spot, texp, cp_sign=1):
-        ''' 
-        <-- PUT your implementation here
-        '''
-        return 0
+          iv_func = lambda _vol: \
+            bsm_price(strike, spot, _vol, texp, self.intr, self.divr, cp_sign) - price
+        vol = sopt.brentq(iv_func, 0, 10)
+        return vol
