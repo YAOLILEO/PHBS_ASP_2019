@@ -81,17 +81,6 @@ def basket_price_mc(
 
 def basket_price_norm_analytic(strike, spot, vol, weights, texp, cor_m, intr=0.0, divr=0.0, cp_sign=1):
     
-    '''
-    The analytic (exact) option price under the normal model
-    
-    1. compute the forward of the basket
-    2. compute the normal volatility of basket
-    3. plug in the forward and volatility to the normal price formula
-    normal_formula(strike, spot, vol, texp, intr=0.0, divr=0.0, cp_sign=1)
-    it is already imorted
-    
-    PUT YOUR CODE BELOW
-    '''
     div_fac = np.exp(-texp*divr)
     disc_fac = np.exp(-texp*intr)
     forward = spot / disc_fac * div_fac
