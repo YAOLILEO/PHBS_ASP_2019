@@ -121,6 +121,17 @@ class ModelHagan:
         return sigma
     
     def calibrate3(self, price_or_vol3, strike3, spot, texp=None, cp_sign=1, setval=False, is_vol=True):
+       
+        def function(strike3):
+            vol1 = self.bsm_vol(strike3[0], forward, texp, sigma)
+            vol2 = self.bsm_vol(strike3[1], forward, texp, sigma)
+            vol3 = self.bsm_vol(strike3[2], forward, texp, sigma)
+            vol = [vol1, vol2, vol3]
+            
+        s_vol = sopt.root(function, price_or_vol3)
+    
+        return s_vol
+        
         '''  
         Given option prices or bsm vols at 3 strikes, compute the sigma, alpha, rho to fit the data
         If prices are given (is_vol=False) convert the prices to vol first.
@@ -128,7 +139,6 @@ class ModelHagan:
         you may use sopt.root
         # https://docs.scipy.org/doc/scipy-0.18.1/reference/generated/scipy.optimize.root.html#scipy.optimize.root
         '''
-        return 0, 0, 0 # sigma, alpha, rho
 
 '''
 Hagan model class for beta=0
@@ -170,7 +180,18 @@ class ModelNormalHagan:
             self.sigma = sigma
         return sigma
 
-    def calibrate3(self, price_or_vol3, strike3, spot, texp=None, cp_sign=1, setval=False, is_vol=True):
+    def calibrate3(self, price_or_vol3, strike3, forward, texp=None, cp_sign=1, setval=False, is_vol=True):
+        
+        def function(x):
+            vol1 = self.norm_vol(strike3[0], forward, texp)
+            vol2 = self.norm_vol(strike3[1], forward, texp)
+            vol3 = self.norm_vol(strike3[2], forward, texp)
+            vol = [vol1, vol2, vol3]
+            return vol
+        s_vol = sopt.root(function, price_or_vol3)
+    
+        return s_vol
+        
         '''  
         Given option prices or normal vols at 3 strikes, compute the sigma, alpha, rho to fit the data
         If prices are given (is_vol=False) convert the prices to vol first.
@@ -178,7 +199,6 @@ class ModelNormalHagan:
         you may use sopt.root
         # https://docs.scipy.org/doc/scipy-0.18.1/reference/generated/scipy.optimize.root.html#scipy.optimize.root
         '''
-        return 0, 0, 0 # sigma, alpha, rho
 
 '''
 MC model class for Beta=1
